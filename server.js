@@ -322,6 +322,41 @@ app.get('/api/compute/quota', proxied(async r => {
   if (!pid) return {};
   return (await axios.get(`${OS}:${P.nova}/v2.1/os-quota-sets/${pid}?usage=true`, {headers:novaH(getToken(r))})).data.quota_set;
 }));
+// ── ADD THESE ROUTES TO server.js (before the PORT line) ─────────────────────
+
+// ── ROLE ASSIGNMENTS ──────────────────────────────────────────────────────────
+app.get('/api/identity/role-assignments', proxied(async r => {
+  const res = await axios.get(`${OS}:${P.keystone}/v3/role_assignments?include_names=true`, {headers:defH(getToken(r))});
+  return res.data.role_assignments || [];
+}));
+
+app.post('/api/identity/role-assignments', proxied(async r => {
+  const { user_id, project_id, role_id } = r.body;
+  if (!user_id||!project_id||!role_id) throw new Error('user_id, project_id, role_id required');
+  await axios.put(
+    `${OS}:${P.keystone}/v3/projects/${project_id}/users/${user_id}/roles/${role_id}`,
+    {}, {headers:defH(getToken(r))}
+  );
+  return { success:true };
+}));
+
+app.delete('/api/identity/role-assignments', proxied(async r => {
+  const { user_id, project_id, role_id } = r.query;
+  if (!user_id||!project_id||!role_id) throw new Error('user_id, project_id, role_id required');
+  await axios.delete(
+    `${OS}:${P.keystone}/v3/projects/${project_id}/users/${user_id}/roles/${role_id}`,
+    {headers:defH(getToken(r))}
+  );
+  return { success:true };
+}));
+
+// ── NETWORK PORTS (needed for auto-FIP association) ───────────────────────────
+// Already exists but add device_id filter support
+app.get('/api/network/ports/by-device', proxied(async r => {
+  const { device_id } = r.query;
+  const qs = device_id ? `?device_id=${device_id}` : '';
+  return (await axios.get(`${OS}:${P.neutron}/v2.0/ports${qs}`, {headers:defH(getToken(r))})).data.ports;
+}));
 app.put('/api/compute/quota/:pid',        proxied(async r => (await axios.put(`${OS}:${P.nova}/v2.1/os-quota-sets/${r.params.pid}`, r.body, {headers:novaH(getToken(r))})).data.quota_set));
 app.get('/api/compute/hypervisors',       proxied(async r => (await axios.get(`${OS}:${P.nova}/v2.1/os-hypervisors/detail`,{headers:novaH(getToken(r))})).data.hypervisors));
 app.get('/api/compute/availability-zones',proxied(async r => (await axios.get(`${OS}:${P.nova}/v2.1/os-availability-zone/detail`,{headers:novaH(getToken(r))})).data.availabilityZoneInfo));
