@@ -1,6 +1,6 @@
 // src/components/Sidebar.jsx — v2.3
 import { useStore } from "../hooks/useStore";
-import { ThemeToggle } from "../hooks/useTheme.js";
+import { ThemeToggle } from "../hooks/useTheme";
 
 const NAV = [
   { id:"overview",    label:"OVERVIEW",       icon:"⬡",  group:"PROJECT" },

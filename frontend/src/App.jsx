@@ -1,7 +1,7 @@
 // src/App.jsx — v2.3
 import { useState, useEffect, useCallback } from "react";
 import { StoreProvider, useStore } from "./hooks/useStore";
-import { ThemeProvider } from "./hooks/useTheme.js";
+import { ThemeProvider } from "./hooks/useTheme";
 import { setToken } from "./api/client.js";
 import { auth as authApi, identity, compute as computeApi } from "./api/openstack.js";
 import ParticleField from "./components/ParticleField.jsx";
