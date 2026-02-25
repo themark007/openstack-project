@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap');
 @import './Extra.css';
+@import './theme.css';
 :root {
   --bg: #030b0d; --surface: #070e11; --surface2: #0a1316; --surface3: #0d181c;
   --border: rgba(0,255,200,.1); --border-hi: rgba(0,255,200,.3);
