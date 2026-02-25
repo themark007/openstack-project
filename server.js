@@ -204,6 +204,114 @@ app.get('/api/compute/flavors', proxied(async r => {
     throw e;
   }
 }));
+// ══════════════════════════════════════════════════════════════════════════════
+// ADD THESE ROUTES TO server.js  (paste before the final server.listen line)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Security Group Rules ──────────────────────────────────────────────────────
+app.get('/api/network/security-group-rules', proxied(async r => {
+  const sgId = r.query.security_group_id;
+  const qs   = sgId ? `?security_group_id=${sgId}` : '';
+  return (await axios.get(`${OS}:${P.neutron}/v2.0/security-group-rules${qs}`, {headers:defH(getToken(r))})).data.security_group_rules;
+}));
+
+app.post('/api/network/security-group-rules', proxied(async r => {
+  const res = await axios.post(`${OS}:${P.neutron}/v2.0/security-group-rules`,
+    { security_group_rule: r.body }, {headers:defH(getToken(r))});
+  return res.data.security_group_rule;
+}));
+
+app.delete('/api/network/security-group-rules/:id', proxied(async r => {
+  await axios.delete(`${OS}:${P.neutron}/v2.0/security-group-rules/${r.params.id}`, {headers:defH(getToken(r))});
+  return { success: true };
+}));
+
+// ── Resize / Confirm / Revert ──────────────────────────────────────────────────
+// These go through the existing /api/compute/servers/:id/action route — no new routes needed.
+// Resize: POST /api/compute/servers/:id/action  { resize: { flavorRef: "FLAVOR_ID" } }
+// Confirm: POST /api/compute/servers/:id/action { confirmResize: null }
+// Revert:  POST /api/compute/servers/:id/action { revertResize: null }
+
+// ── Ports by device_id (for auto floating IP) ─────────────────────────────────
+app.get('/api/network/ports', proxied(async r => {
+  const device_id = r.query.device_id;
+  const qs = device_id ? `?device_id=${device_id}` : '';
+  return (await axios.get(`${OS}:${P.neutron}/v2.0/ports${qs}`, {headers:defH(getToken(r))})).data.ports;
+}));
+
+// ── Network resource PUT (edit from topology) ─────────────────────────────────
+app.put('/api/network/networks/:id', proxied(async r => {
+  const res = await axios.put(`${OS}:${P.neutron}/v2.0/networks/${r.params.id}`,
+    { network: r.body }, {headers:defH(getToken(r))});
+  return res.data.network;
+}));
+
+app.put('/api/network/routers/:id', proxied(async r => {
+  const res = await axios.put(`${OS}:${P.neutron}/v2.0/routers/${r.params.id}`,
+    { router: r.body }, {headers:defH(getToken(r))});
+  return res.data.router;
+}));
+
+app.put('/api/network/subnets/:id', proxied(async r => {
+  const res = await axios.put(`${OS}:${P.neutron}/v2.0/subnets/${r.params.id}`,
+    { subnet: r.body }, {headers:defH(getToken(r))});
+  return res.data.subnet;
+}));
+
+app.delete('/api/network/networks/:id', proxied(async r => {
+  await axios.delete(`${OS}:${P.neutron}/v2.0/networks/${r.params.id}`, {headers:defH(getToken(r))});
+  return { success: true };
+}));
+
+app.delete('/api/network/routers/:id', proxied(async r => {
+  await axios.delete(`${OS}:${P.neutron}/v2.0/routers/${r.params.id}`, {headers:defH(getToken(r))});
+  return { success: true };
+}));
+
+app.delete('/api/network/subnets/:id', proxied(async r => {
+  await axios.delete(`${OS}:${P.neutron}/v2.0/subnets/${r.params.id}`, {headers:defH(getToken(r))});
+  return { success: true };
+}));
+
+// ── Floating IP allocate + associate (for auto-FIP) ───────────────────────────
+// POST /api/network/floatingips  { floating_network_id: "..." }
+// PUT  /api/network/floatingips/:id  { port_id: "..." }
+
+// floatingips GET/POST already exist. Add PUT:
+app.put('/api/network/floatingips/:id', proxied(async r => {
+  const res = await axios.put(`${OS}:${P.neutron}/v2.0/floatingips/${r.params.id}`,
+    { floatingip: r.body }, {headers:defH(getToken(r))});
+  return res.data.floatingip;
+}));
+
+// ── Subnets list (needed for topology) ────────────────────────────────────────
+app.get('/api/network/subnets', proxied(async r => {
+  return (await axios.get(`${OS}:${P.neutron}/v2.0/subnets`, {headers:defH(getToken(r))})).data.subnets;
+}));
+
+// ── Console output action ─────────────────────────────────────────────────────
+// Already handled via /api/compute/servers/:id/action — no change needed.
+
+// ── Compute tenant usage (for resource charts) ────────────────────────────────
+app.get('/api/compute/usage', proxied(async r => {
+  const tk = getToken(r);
+  if (!tk) return {};
+  try {
+    const now   = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const end   = now.toISOString().split('T')[0];
+    const res = await axios.get(
+      `${OS}:${P.nova}/v2.1/os-simple-tenant-usage?detailed=1&start=${start}&end=${end}`,
+      {headers:novaH(tk,null)}
+    );
+    return res.data;
+  } catch(e) { return {}; }
+}));
+
+// ── Server security group add/remove ──────────────────────────────────────────
+// Handled by existing /api/compute/servers/:id/action with body:
+// { addSecurityGroup: { name: "sgname" } }
+// { removeSecurityGroup: { name: "sgname" } }
 app.post('/api/compute/flavors',      proxied(async r => (await axios.post(`${OS}:${P.nova}/v2.1/flavors`, r.body, {headers:novaH(getToken(r))})).data.flavor));
 app.delete('/api/compute/flavors/:id',proxied(async r => { await axios.delete(`${OS}:${P.nova}/v2.1/flavors/${r.params.id}`,{headers:novaH(getToken(r))}); return {success:true}; }));
 app.get('/api/compute/keypairs',      proxied(async r => (await axios.get(`${OS}:${P.nova}/v2.1/os-keypairs`,{headers:novaH(getToken(r))})).data.keypairs));
