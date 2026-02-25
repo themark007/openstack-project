@@ -1,6 +1,6 @@
 // src/pages/Compute.jsx — v2.3: click row → dedicated InstanceDetail page
 import { useState, useCallback } from "react";
-import { useStore } from "../hooks/useStore.js";
+import { useStore } from "../hooks/useStore";
 import { compute } from "../api/openstack.js";
 import { Table, Btn, Modal, Field, Input, Select, Toggle, Badge, StatusDot, IconBtn, ConfirmModal, SectionHeader, Mono, Spinner } from "../components/UI.jsx";
 import SSHTerminal from "../components/SSHTerminal.jsx";

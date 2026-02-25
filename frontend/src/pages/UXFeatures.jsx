@@ -6,7 +6,7 @@
 // Feature 5: Bulk Instance Actions
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useStore } from "../hooks/useStore.jsx";
+import { useStore } from "../hooks/useStorex";
 import { GET, POST } from "../api/client.js";
 import { Btn, Modal, IconBtn, Badge, SectionHeader, Mono, Spinner } from "../components/UI.jsx";
 import { compute } from "../api/openstack.js";

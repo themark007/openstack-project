@@ -1,5 +1,5 @@
 // src/components/Sidebar.jsx — v2.3
-import { useStore } from "../hooks/useStore.js";
+import { useStore } from "../hooks/useStore";
 import { ThemeToggle } from "../hooks/useTheme.js";
 
 const NAV = [

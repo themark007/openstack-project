@@ -1,7 +1,7 @@
 // src/pages/SecurityGroupBuilder.jsx
 // Visual security group rule builder with protocol presets
 import { useState, useEffect } from 'react';
-import { useStore } from '../hooks/useStore.js';
+import { useStore } from '../hooks/useStore';
 import { GET, POST, DEL } from '../api/client.js';
 
 // ── Protocol Presets ──────────────────────────────────────────────────────────

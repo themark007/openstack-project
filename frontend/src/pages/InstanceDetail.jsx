@@ -1,7 +1,7 @@
 // src/pages/InstanceDetail.jsx
 // Full dedicated page for a single instance — click any row in Compute to open
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useStore } from '../hooks/useStore.js';
+import { useStore } from '../hooks/useStore';
 import { GET, POST, PUT, DEL } from '../api/client.js';
 import { compute } from '../api/openstack.js';
 import SSHTerminal from '../components/SSHTerminal.jsx';

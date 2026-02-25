@@ -1,6 +1,6 @@
 // src/App.jsx — v2.3
 import { useState, useEffect, useCallback } from "react";
-import { StoreProvider, useStore } from "./hooks/useStore.js";
+import { StoreProvider, useStore } from "./hooks/useStore";
 import { ThemeProvider } from "./hooks/useTheme.js";
 import { setToken } from "./api/client.js";
 import { auth as authApi, identity, compute as computeApi } from "./api/openstack.js";

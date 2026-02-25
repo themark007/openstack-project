@@ -1,7 +1,7 @@
 // src/pages/Overview.jsx  — Customizable widget dashboard
 // Replaces the existing Overview.jsx with drag-to-reorder, toggle, pin widgets
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useStore } from '../hooks/useStore.js';
+import { useStore } from '../hooks/useStore';
 import { GET } from '../api/client.js';
 
 // ── Persist layout to localStorage ───────────────────────────────────────────

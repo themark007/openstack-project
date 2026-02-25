@@ -1,6 +1,6 @@
 // src/pages/Heat.jsx — OpenStack Heat Orchestration
 import { useState, useEffect } from "react";
-import { useStore } from "../hooks/useStore.jsx";
+import { useStore } from "../hooks/useStorex";
 import { GET, POST, DEL } from "../api/client.js";
 import { Table, Btn, Modal, Field, Input, IconBtn, ConfirmModal, SectionHeader, StatCard, Badge, Mono } from "../components/UI.jsx";
 
